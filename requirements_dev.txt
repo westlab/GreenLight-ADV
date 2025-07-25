@@ -1,0 +1,11 @@
+bumpversion
+flake8
+jupyter
+jupytext
+pre-commit
+black
+isort
+setuptools
+twine
+build
+
