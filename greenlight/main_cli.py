@@ -80,7 +80,7 @@ def main():
         "greenlight_output_" + datetime.datetime.now().strftime("%Y%m%d_%H%M") + ".csv",
     )
     default_start_date = "2021-09-27"
-    default_end_date = "2022-09-12"
+    default_end_date = "2021-09-28"
     default_mods = os.path.join("katzin_2021", "definition", "lamp_hps_katzin_2021.json")
 
     # Arguments (all optional, but will error if required files are missing)

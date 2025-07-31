@@ -8,4 +8,4 @@ isort
 setuptools
 twine
 build
-
+paho-mqtt
