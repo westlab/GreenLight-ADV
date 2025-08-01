@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #Copyright (c) 2025 Shanaka Prageeth, Keio University, Japan
 #SPDX-License-Identifier: BSD-3-Clause-Clear
 set -e
@@ -56,6 +56,8 @@ if [ -f "$TEST_CSV_SRC" ]; then
   echo "Input data file $TEST_CSV_DST has $LINE_COUNT lines."
   if [ "$LINE_COUNT" -lt 20 ]; then
     echo "ERROR: $TEST_CSV_DST exists but has less than 20 lines. Skipping input data formatting and CLI example."
+    echo " Please setup GIT LFS if you have not done so already."
+    exit 1
   else
     echo "Formatting input data..."
     python3 $BASEDIR/scripts/katzin_2021/katzin_2021_format_input_data.py
@@ -75,4 +77,5 @@ if [ -f "$TEST_CSV_SRC" ]; then
   fi
 else
   echo "WARNING: Test data $TEST_CSV_SRC not found. Skipping input data formatting and CLI example."
+  exit 1
 fi
