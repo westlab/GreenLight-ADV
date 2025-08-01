@@ -49,7 +49,7 @@ echo " starting tests...."
 mkdir -p $BASEDIR/models/katzin_2021/input_data/energyPlus_original/
 cp $BASEDIR/test_data/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv
 python3 $BASEDIR/scripts/katzin_2021/katzin_2021_format_input_data.py
-python3 $BASEDIR/scripts/greenlight_example.py
+#python3 $BASEDIR/scripts/greenlight_example.py
 echo "=========================================================="
 echo "Executing greenlight.main_cli with example parameters..."
 echo "=========================================================="

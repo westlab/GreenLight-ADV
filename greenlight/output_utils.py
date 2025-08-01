@@ -3,17 +3,17 @@
 出力方式の切り替えと MQTT publish を行うユーティリティ
 """
 
-from typing import Iterable, Optional, Dict, Any
+from typing import Any, Dict, Iterable, Optional
+
 import paho.mqtt.client as mqtt  # ライブラリは requirements に追加しておく
 
-import json
-
 # 出力モード: 'show' ならコンソール表示、'mqtt' ならMQTT publish
-_OUTPUT_MODE: str = "show"
+# _OUTPUT_MODE: str = "show"
 
 # MQTT設定を格納する辞書。host, port, topic, username, password など
 _MQTT_SETTINGS: Dict[str, Any] = {}
 _client = None  # paho-mqtt client インスタンス
+
 
 def configure(mode: str = "none", mqtt_settings: Optional[Dict[str, Any]] = None) -> None:
     """
@@ -36,6 +36,7 @@ def configure(mode: str = "none", mqtt_settings: Optional[Dict[str, Any]] = None
         # show モードならクライアントは不要
         _client = None
 
+
 def output_row(row_values: Iterable[Any]) -> None:
     """
     行データを出力する。モードに応じてコンソール表示か MQTT publish を行う。
@@ -52,9 +53,11 @@ def output_row(row_values: Iterable[Any]) -> None:
         # 画面に表示
         print(payload, flush=True)
 
+
 def get_mode() -> str:
     """現在の出力モードを返す。'show' または 'mqtt'"""
     return _OUTPUT_MODE
+
 
 def info(message: str) -> None:
     """

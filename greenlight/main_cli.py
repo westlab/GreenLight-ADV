@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 # Post-processing and visualization
 import pandas as pd
 
-from . import GreenLight, convert_energy_plus
+from . import GreenLight, convert_energy_plus, output_utils
 
 
 def run_simulation_cli(
@@ -101,11 +101,69 @@ def main():
     parser.add_argument(
         "--mods", type=str, default=default_mods, help="Custom modifications (file path or text, optional)."
     )
+    parser.add_argument("--show", action="store_true", help="Show results in console")
+    parser.add_argument("--mqtt", action="store_true", help="Publish Results via MQTT")
+    parser.add_argument(
+        "--mqtt-config",
+        type=str,
+        default="config.json",
+        help="MQTT configuration file (JSON) path. Defaults to 'config.json'.",
+    )
+    parser.add_argument("--mqtt-host", type=str, help="MQTT host name")
+    parser.add_argument("--mqtt-port", type=int, help="MQTT port", default=1883)
+    parser.add_argument("--mqtt-topic", type=str, help="MQTT publish topic name")
+    parser.add_argument("--mqtt-username", type=str, help="MQTT username")
+    parser.add_argument("--mqtt-password", type=str, help="MQTT password")
 
     args = parser.parse_args()
 
     # Argument verification
     errors = []
+    # --show and --mqtt are both false by default, user must explicitly set them
+    if args.mqtt and args.show:
+        parser.error("--mqtt and --show cannot be used together.")
+    elif args.mqtt:
+        mode = "mqtt"
+    elif args.show:
+        mode = "show"
+    else:
+        mode = "none"
+
+    # MQTT validation
+    mqtt_settings = {}
+    if args.mqtt:
+        config_path = args.mqtt_config
+        config_loaded = False
+        import json
+
+        if config_path and os.path.exists(config_path):
+            try:
+                with open(config_path, "r", encoding="utf-8") as cfg:
+                    mqtt_settings = json.load(cfg)
+                config_loaded = True
+            except Exception as e:
+                errors.append(f"Failed to parse MQTT config file: {e}")
+        if not config_loaded:
+            # Override config with CLI args if provided
+            if args.mqtt_host:
+                mqtt_settings["host"] = args.mqtt_host
+            if args.mqtt_port:
+                mqtt_settings["port"] = args.mqtt_port
+            if args.mqtt_topic:
+                mqtt_settings["topic"] = args.mqtt_topic
+            if args.mqtt_username:
+                mqtt_settings["username"] = args.mqtt_username
+            if args.mqtt_password:
+                mqtt_settings["password"] = args.mqtt_password
+        # Check required MQTT fields
+        required_mqtt_fields = ["host", "port", "topic"]
+        missing_mqtt = [f for f in required_mqtt_fields if f not in mqtt_settings or not mqtt_settings[f]]
+        if missing_mqtt:
+            errors.append(f"Missing required MQTT settings: {', '.join(missing_mqtt)}")
+    else:
+        # If --mqtt is not set, ignore all mqtt options
+        mqtt_settings = {}
+
     if not os.path.isdir(args.base_path):
         errors.append(f"Base path does not exist: {args.base_path}")
     if not os.path.isfile(args.model_file):
@@ -134,7 +192,27 @@ def main():
             "--input_data_file /workspaces/GreenLight/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv "
             "--mods katzin_2021/definition/lamp_hps_katzin_2021.json"
         )
+        if args.mqtt:
+            print(
+                "\nExample usage with MQTT:\n"
+                "python -m greenlight.main_cli "
+                "--mqtt "
+                "--mqtt-host <host> "
+                "--mqtt-port <port> "
+                "--mqtt-topic <topic> "
+                "--mqtt-username <username> "
+                "--mqtt-password <password> "
+                "--base_path /workspaces/GreenLight/models "
+                "--model_file /workspaces/GreenLight/models/katzin_2021/definition/main_katzin_2021.json "
+                "--output_file /workspaces/GreenLight/models/katzin_2021/output/greenlight_output_20240613_1200.csv "
+                "--start_date 1983-01-01 "
+                "--end_date 1983-01-02 "
+                "--input_data_file /workspaces/GreenLight/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv "
+                "--mods katzin_2021/definition/lamp_hps_katzin_2021.json"
+            )
         exit(1)
+
+    output_utils.configure(mode=mode, mqtt_settings=mqtt_settings)
 
     # Collect and validate inputs
     sim_args = run_simulation_cli(

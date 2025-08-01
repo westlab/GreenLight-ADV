@@ -125,3 +125,8 @@ create_git_repo.sh
 
 plots
 EnergyPlus-*.run
+
+node_modules
+
+package-lock.json
+package.json
