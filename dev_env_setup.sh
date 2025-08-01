@@ -52,9 +52,12 @@ TEST_CSV_DST="$BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tok
 if [ -f "$TEST_CSV_SRC" ]; then
   cp "$TEST_CSV_SRC" "$TEST_CSV_DST"
   # Check if the copied file has at least 20 lines (header=18 + 1 data + 1 safety)
-  if [ "$(wc -l < "$TEST_CSV_DST")" -lt 20 ]; then
+  LINE_COUNT=$(wc -l < "$TEST_CSV_DST")
+  echo "Input data file $TEST_CSV_DST has $LINE_COUNT lines."
+  if [ "$LINE_COUNT" -lt 20 ]; then
     echo "ERROR: $TEST_CSV_DST exists but has less than 20 lines. Skipping input data formatting and CLI example."
   else
+    echo "Formatting input data..."
     python3 $BASEDIR/scripts/katzin_2021/katzin_2021_format_input_data.py
     #python3 $BASEDIR/scripts/greenlight_example.py
     echo "=========================================================="
