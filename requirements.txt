@@ -3,5 +3,5 @@ numexpr~=2.10.1
 scipy~=1.14.1
 pandas~=2.2.3
 tkcalendar~=1.6.1
-matplotlib
-paho-mqtt
+matplotlib~=3.10.0
+paho-mqtt~=2.1.0
