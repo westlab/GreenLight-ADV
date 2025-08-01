@@ -47,18 +47,24 @@ pre-commit install
 source .venv/bin/activate
 echo " starting tests...."
 mkdir -p $BASEDIR/models/katzin_2021/input_data/energyPlus_original/
-cp $BASEDIR/test_data/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv
-python3 $BASEDIR/scripts/katzin_2021/katzin_2021_format_input_data.py
-#python3 $BASEDIR/scripts/greenlight_example.py
-echo "=========================================================="
-echo "Executing greenlight.main_cli with example parameters..."
-echo "=========================================================="
-python -m greenlight.main_cli \
-  --base_path $BASEDIR/models \
-  --model_file $BASEDIR/models/katzin_2021/definition/main_katzin_2021.json \
-  --output_file $BASEDIR/output/greenlight_output_20240613_1200.csv \
-  --start_date 1983-01-01 \
-  --end_date 1983-01-02 \
-  --input_data_file $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv \
-  --mods $BASEDIR/models/katzin_2021/definition/lamp_hps_katzin_2021.json
-echo "Example script executed. You can now start developing with Greenlight."
+TEST_CSV_SRC="$BASEDIR/test_data/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv"
+TEST_CSV_DST="$BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv"
+if [ -f "$TEST_CSV_SRC" ]; then
+  cp "$TEST_CSV_SRC" "$TEST_CSV_DST"
+  python3 $BASEDIR/scripts/katzin_2021/katzin_2021_format_input_data.py
+  #python3 $BASEDIR/scripts/greenlight_example.py
+  echo "=========================================================="
+  echo "Executing greenlight.main_cli with example parameters..."
+  echo "=========================================================="
+  python -m greenlight.main_cli \
+    --base_path $BASEDIR/models \
+    --model_file $BASEDIR/models/katzin_2021/definition/main_katzin_2021.json \
+    --output_file $BASEDIR/output/greenlight_output_20240613_1200.csv \
+    --start_date 1983-01-01 \
+    --end_date 1983-01-02 \
+    --input_data_file $BASEDIR/models/katzin_2021/input_data/energyPlus_original/JPN_Tokyo.Hyakuri.477150_IWECEPW.csv \
+    --mods $BASEDIR/models/katzin_2021/definition/lamp_hps_katzin_2021.json
+  echo "Example script executed. You can now start developing with Greenlight."
+else
+  echo "WARNING: Test data $TEST_CSV_SRC not found. Skipping input data formatting and CLI example."
+fi
