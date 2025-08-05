@@ -126,3 +126,12 @@ create_git_repo.sh
 
 plots
 EnergyPlus-*.run
+
+# Python virtual environment
+bin/
+etc/
+include/
+share/
+
+# Node.js dependencies
+node_modules/
