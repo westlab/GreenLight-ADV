@@ -8,7 +8,7 @@ from typing import Any, Dict, Iterable, Optional
 import paho.mqtt.client as mqtt  # ライブラリは requirements に追加しておく
 
 # 出力モード: 'show' ならコンソール表示、'mqtt' ならMQTT publish
-_OUTPUT_MODE: str = "show"
+# _OUTPUT_MODE: str = "show"
 
 # MQTT設定を格納する辞書。host, port, topic, username, password など
 _MQTT_SETTINGS: Dict[str, Any] = {}
