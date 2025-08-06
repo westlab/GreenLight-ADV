@@ -32,6 +32,8 @@ def configure(mode: str = "none", mqtt_settings: Optional[Dict[str, Any]] = None
             _client.username_pw_set(username, password)
         _client.connect(host, port)
         # 非同期 publish を使う場合は loop_start() を呼び出してもよい
+    elif _OUTPUT_MODE == "show":
+        _client = None
     else:
         # show モードならクライアントは不要
         _client = None
@@ -52,6 +54,9 @@ def output_row(row_values: Iterable[Any]) -> None:
     elif _OUTPUT_MODE == "show":
         # 画面に表示
         print(payload, flush=True)
+    else:
+        # none モードでは何もしない
+        pass
 
 
 def get_mode() -> str:
@@ -62,7 +67,10 @@ def get_mode() -> str:
 def info(message: str) -> None:
     """
     ログや進捗などの情報を表示する。
-    show モードのときだけ print() を行い、mqtt モードでは何もしない。
+    show または none モードのときだけ print() を行い、mqtt モードでは何もしない。
     """
-    if _OUTPUT_MODE == "show":
-        print(message, flush=True)
+    if _OUTPUT_MODE == "show" or _OUTPUT_MODE == "none":
+        if message.startswith("\r"):
+            print(message, end="", flush=True)
+        else:
+            print(message, flush=True)

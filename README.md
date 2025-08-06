@@ -1,3 +1,16 @@
+# GreenLight-Advanced
+このレポジトリは、GreenLightをフォークして、研究上利用可能な状態に更新するために構築しました。
+新たな機能の詳細は別途説明する予定です。
+
+なお、現状で、
+- シミュレーション経過途中での各種データ出力機能と、MQTT接続機能
+- 出力されるCSVファイルのグラフ化機能
+- GitHub Code Spacesでのシミュレーションの実行、出力CSVの保存、およびプロットを直接実行する機能
+
+以上が追加されています。
+
+# 以降、当時のオリジナルの内容となります
+--------
 # GreenLight
 A Python platform for creating, modifying, and combining dynamic models, with a focus on horticultural greenhouses and crops.
 
