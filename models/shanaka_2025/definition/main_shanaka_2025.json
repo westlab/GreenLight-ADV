@@ -1,0 +1,24 @@
+{
+   "About" : "Model structure for the Green House simulation with MQTT real time publishing",
+   "Usage" : "This file can run as standalone, in which case no weather data will be loaded. Instead, constant values will be used for weather data. To run meaningful simulations, weather data can be acquired from EnergyPlus, see katzin_2021\\readme.txt, and scripts\\katzin_2021\\katzin_2021_create_formatted_weather.py. The simulation length is set to 1 day = 60x60x24 = 86400 seconds. Change this to 350 days = 60*60*24*350 = 30240000 to run a full tomato crop season. See scripts\\katzin_2021_run_sims.py for more examples",
+   "Authors" : "Shanaka Abeysiriwardhana(Keio University)",
+   "Date" : "This file was created in August 2025",
+   "References" : {
+      "Katzin 2021" : "Katzin, David (2021). Energy Saving by LED Lighting in Greenhouses : A Process-Based Modelling Approach. PhD thesis, Wageningen University. https://doi.org/10.18174/544434",
+      "Katzin 2021a" : "Katzin, Marcelis, Van Mourik (2021). Energy Savings in Greenhouses by Transition from High-Pressure Sodium to LED Lighting. Applied Energy 281:116019. https://doi.org/10.1016/j.apenergy.2020.116019"
+   },
+   "URL" : "https://github.com/davkat1/GreenLight",
+   "File" : "GreenLight-ADV/models/shanaka_2025/definition/main_shanaka_2025.json",
+   "processing_order" : [
+      "vanthoor_2011/greenhouse_vanthoor_2011_chapter_8.json",
+      "vanthoor_2011/crop_vanthoor_2011_chapter_9_simplified.json",
+      "extension_greenhouse_katzin_2021_vanthoor_2011.json",
+      {"options" : {
+         "t_start" : "0",
+         "t_end" : "86400",
+         "solving_method": "solve_ivp",
+         "real_time": "true",
+         "real_time_delay": "10.0"
+      }}
+   ]
+}

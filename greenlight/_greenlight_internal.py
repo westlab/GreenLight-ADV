@@ -144,6 +144,8 @@ class GreenLightInternal:
             "warn_loading": "False",  # If "True", warnings are issued during loading
             "warn_runtime": "False",  # If "True", warnings are issued during runtime
             "log_runtime_warnings": "True",  # If "True", runtime warnings are included in the simulation log
+            "real_time": "false",  # If "true", simulation runs in real-time
+            "real_time_delay": "1.0",  # Delay factor for real-time simulation (1.0 = real-time, 2.0 = half speed)
         }
 
     def add_to_log(self, log_text: str, warn: bool = True, to_print: bool = False) -> None:

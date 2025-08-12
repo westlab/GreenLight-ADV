@@ -38,11 +38,9 @@ def configure(mode: str = "none", mqtt_settings: Optional[Dict[str, Any]] = None
         # 非同期 publish を使う場合は loop_start() を呼び出してもよい
     elif _OUTPUT_MODE == "show":
         _client = None
-        print(f"MQTT client failed: host={host}, port={port}, username = {username}")
     else:
         # show モードならクライアントは不要
         _client = None
-        print(f"MQTT client failed: host={host}, port={port}, username = {username}")
 
 
 def output_row(row_values: Iterable[Any]) -> None:

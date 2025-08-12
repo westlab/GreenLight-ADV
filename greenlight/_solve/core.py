@@ -73,7 +73,7 @@ def solve_model(mdl: GreenLightInternal) -> None:
     mdl.add_to_log(
         f"Simulation started at time (ISO format): {datetime.datetime.now().isoformat()}", warn=False, to_print=True
     )
-
+    print(f"Solving method: {mdl.options['solving_method']}")
     if mdl.options["solving_method"] == "solve_ivp":
         _solve_ivp.SolveIvp.solve(mdl)
     elif mdl.options["solving_method"] == "solve_ivp_from_str":

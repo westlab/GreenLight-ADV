@@ -15,6 +15,7 @@ Public functions:
 
 import logging
 import sys
+import time
 import warnings
 from typing import Tuple
 
@@ -53,7 +54,6 @@ class SolveIvp(Solver):
         """
         # Workspace where computations occur
         computation_space = {}
-
         # Import required packages to computation_space
         if mdl.options["formatting_mode"] == "numpy":
             exec("import numpy as np", computation_space)
@@ -71,15 +71,26 @@ class SolveIvp(Solver):
                 exec(f"def {key}: return {mdl.variables_formatted[key]}", computation_space)
 
         # Set up the arguments for solve_ivp
+        # When in real-time mode, ensure we get regular output steps
+        if mdl.options.get("real_time", "false").strip().lower() == "true":
+            print("Running in real-time mode with single-step iterations")
+            delay_factor = float(mdl.options.get("real_time_delay", "1.0"))
+            # Force solver to take single steps
+            mdl.options["solver"] = "RK45"  # Better for single-step iterations
+            mdl.options["first_step"] = str(delay_factor)
+            mdl.options["max_step"] = str(delay_factor)
+            mdl.options["output_step"] = str(delay_factor)
 
-        # If mdl.options["t_eval"] is "None", use None. Otherwise, use time points from mdl.options["t_start"]
-        # to mdl.options["t_end"], with steps mdl.options["output_step"]
-        if mdl.options["t_eval"] == "None":
-            t_eval = None
-        else:
             t_eval = np.arange(
                 float(mdl.options["t_start"]), float(mdl.options["t_end"]), float(mdl.options["output_step"])
             )
+        else:
+            if mdl.options["t_eval"] == "None":
+                t_eval = None
+            else:
+                t_eval = np.arange(
+                    float(mdl.options["t_start"]), float(mdl.options["t_end"]), float(mdl.options["output_step"])
+                )
 
         # If mdl.options["first_step"] was defined as a number, use that one, if not, use None
         try:
@@ -165,6 +176,16 @@ class SolveIvp(Solver):
                         Used to display the progress in solving
         :return dy: The rate of change of the states y at time point t
         """
+        # Track real time and last execution time for synchronization
+        real_time_start = getattr(mdl, "_sim_start_time", None)
+        last_exec_time = getattr(mdl, "_last_exec_time", None)
+
+        if real_time_start is None:
+            mdl._sim_start_time = time.time()
+            mdl._last_exec_time = time.time()
+            real_time_start = mdl._sim_start_time
+            last_exec_time = mdl._last_exec_time
+
         # Get data from input data array
         if mdl.options["interpolation"] == "linear":  # Use linear interpolation
             # Multi-column version of np.interp
@@ -259,9 +280,31 @@ class SolveIvp(Solver):
             else:  # add a new row
                 mdl.full_sol.loc[len(mdl.full_sol.index)] = sol_t
 
-#           print(','.join(str(v) for v in sol_t), flush=True)
+            #           print(','.join(str(v) for v in sol_t), flush=True)
             from greenlight.output_utils import output_row
+
             output_row(sol_t)
+
+        # If real-time simulation is enabled, wait until the correct wall clock time
+        if mdl.options.get("real_time", "false").strip().lower() == "true":
+            current_time = time.time()
+            real_elapsed = current_time - last_exec_time  # Time since last execution
+
+            timestep = float(mdl.options["output_step"])
+
+            # Calculate target sleep time for this timestep
+            target_sleep = timestep
+            sleep_time = max(0, target_sleep - real_elapsed)
+            print(
+                f"Real-time simulation: sleeping for {sleep_time:.2f} seconds to match timestep {timestep:.2f} seconds at time {t:.2f}"
+            )
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+            print(
+                f"Real-time simulation: slept for {sleep_time:.2f} seconds to match timestep {timestep:.2f} seconds at time {t:.2f}"
+            )
+            # Update last execution time
+            mdl._last_exec_time = time.time()
 
         # Calculate the values of the change of states and set them as dy
         dy = np.empty(len(mdl.states))
@@ -302,7 +345,7 @@ class SolveIvp(Solver):
             dy[i] = computation_space["dy"]
 
         # Print out progress. Thanks Simon Luzara from stackoverflow: https://stackoverflow.com/a/72363754
-        info(
+        logging.info(
             "\rRunning: "
             + str(format(np.minimum(100, ((t - t_span[0]) / (t_span[1] - t_span[0])) * 100), ".2f"))
             + "%",
