@@ -28,15 +28,21 @@ def configure(mode: str = "none", mqtt_settings: Optional[Dict[str, Any]] = None
         username = _MQTT_SETTINGS.get("username")
         password = _MQTT_SETTINGS.get("password")
         _client = mqtt.Client()
+        if port == 8883:  # SSL/TLS を使用する場合
+            _client.tls_set(tls_version=mqtt.ssl.PROTOCOL_TLS)
         if username is not None and password is not None:
             _client.username_pw_set(username, password)
         _client.connect(host, port)
+        print(f"MQTT client configured: host={host}, port={port}, username = {username}")
+        _client.publish("sim", payload="sim_started", qos=1)
         # 非同期 publish を使う場合は loop_start() を呼び出してもよい
     elif _OUTPUT_MODE == "show":
         _client = None
+        print(f"MQTT client failed: host={host}, port={port}, username = {username}")
     else:
         # show モードならクライアントは不要
         _client = None
+        print(f"MQTT client failed: host={host}, port={port}, username = {username}")
 
 
 def output_row(row_values: Iterable[Any]) -> None:

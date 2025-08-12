@@ -211,7 +211,9 @@ def main():
                 "--mods katzin_2021/definition/lamp_hps_katzin_2021.json"
             )
         exit(1)
-
+    print("All input parameters are valid.")
+    if mqtt_settings:
+        print("MQTT settings loaded successfully.")
     output_utils.configure(mode=mode, mqtt_settings=mqtt_settings)
 
     # Collect and validate inputs

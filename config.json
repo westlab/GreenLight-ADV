@@ -1,5 +1,7 @@
 {
-  "host": "broker.hivemq.com",
-  "port": 1883,
-  "topic": "greenlight/output"
+  "host": "196e18b5f9d5446ba9df4610fad740ea.s1.eu.hivemq.cloud",
+  "port": 8883,
+  "topic": "greenlight/output",
+  "username": "ci-runner",
+  "password": "cirunner1A"
 }
