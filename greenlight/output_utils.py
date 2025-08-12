@@ -8,7 +8,7 @@ from typing import Any, Dict, Iterable, Optional
 import paho.mqtt.client as mqtt  # ライブラリは requirements に追加しておく
 
 # 出力モード: 'show' ならコンソール表示、'mqtt' ならMQTT publish
-_OUTPUT_MODE: str = "show"
+# _OUTPUT_MODE: str = "show"
 
 # MQTT設定を格納する辞書。host, port, topic, username, password など
 _MQTT_SETTINGS: Dict[str, Any] = {}
@@ -28,9 +28,13 @@ def configure(mode: str = "none", mqtt_settings: Optional[Dict[str, Any]] = None
         username = _MQTT_SETTINGS.get("username")
         password = _MQTT_SETTINGS.get("password")
         _client = mqtt.Client()
+        if port == 8883:  # SSL/TLS を使用する場合
+            _client.tls_set(tls_version=mqtt.ssl.PROTOCOL_TLS)
         if username is not None and password is not None:
             _client.username_pw_set(username, password)
         _client.connect(host, port)
+        print(f"MQTT client configured: host={host}, port={port}, username = {username}")
+        _client.publish("sim", payload="sim_started", qos=1)
         # 非同期 publish を使う場合は loop_start() を呼び出してもよい
     elif _OUTPUT_MODE == "show":
         _client = None

@@ -34,6 +34,7 @@ import numpy as np
 import pandas as pd
 
 from greenlight._greenlight_internal import GreenLightInternal
+from greenlight.output_utils import get_mode
 
 from . import _solve_ivp, _solve_ivp_from_str
 
@@ -72,7 +73,7 @@ def solve_model(mdl: GreenLightInternal) -> None:
     mdl.add_to_log(
         f"Simulation started at time (ISO format): {datetime.datetime.now().isoformat()}", warn=False, to_print=True
     )
-
+    print(f"Solving method: {mdl.options['solving_method']}")
     if mdl.options["solving_method"] == "solve_ivp":
         _solve_ivp.SolveIvp.solve(mdl)
     elif mdl.options["solving_method"] == "solve_ivp_from_str":
@@ -189,4 +190,4 @@ def _compute_full_solution(mdl: GreenLightInternal) -> None:
     if get_mode() == "show":
         for _, row in mdl.full_sol.iterrows():
             # ndarray / Series から Python の数値や文字列に変換する
-            print(','.join(str(v) for v in row.to_list()), flush=True)
+            print(",".join(str(v) for v in row.to_list()), flush=True)

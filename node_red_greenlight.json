@@ -1,0 +1,158 @@
+[
+    {
+        "id": "8f1cad51c7d9b279",
+        "type": "tab",
+        "label": "GreenLight Monitor",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "mqtt-broker-1",
+        "type": "mqtt-broker",
+        "name": "HiveMQ Cloud",
+        "broker": "196e18b5f9d5446ba9df4610fad740ea.s1.eu.hivemq.cloud",
+        "port": "8883",
+        "tls": "b182d5ae0adc0565",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "sim",
+        "birthQos": "0",
+        "birthPayload": "start node red",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "b182d5ae0adc0565",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "isrgrootx1.pem",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "mqtt-sub-1",
+        "type": "mqtt in",
+        "z": "8f1cad51c7d9b279",
+        "name": "GreenLight Data",
+        "topic": "greenlight/output",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "mqtt-broker-1",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 120,
+        "y": 120,
+        "wires": [
+            [
+                "split-1"
+            ]
+        ]
+    },
+    {
+        "id": "split-1",
+        "type": "function",
+        "z": "8f1cad51c7d9b279",
+        "name": "Split CSV",
+        "func": "const values = msg.payload.split(',').map(Number);\nreturn {payload: values};",
+        "outputs": 1,
+        "x": 280,
+        "y": 120,
+        "wires": [
+            [
+                "group-1",
+                "b5c77cc18216a23a"
+            ]
+        ]
+    },
+    {
+        "id": "group-1",
+        "type": "function",
+        "z": "8f1cad51c7d9b279",
+        "name": "Values 0-4",
+        "func": "return {payload: msg.payload.slice(0,5)};",
+        "outputs": 1,
+        "x": 460,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "group-2",
+        "type": "function",
+        "z": "8f1cad51c7d9b279",
+        "name": "Values 5-9",
+        "func": "return {payload: msg.payload.slice(5,10)};",
+        "outputs": 1,
+        "x": 460,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "group-3",
+        "type": "function",
+        "z": "8f1cad51c7d9b279",
+        "name": "Values 10-14",
+        "func": "return {payload: msg.payload.slice(10,15)};",
+        "outputs": 1,
+        "x": 460,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "group-4",
+        "type": "function",
+        "z": "8f1cad51c7d9b279",
+        "name": "Next Group Router",
+        "func": "const totalGroups = Math.ceil(msg.payload.length / 5);\nfor(let i = 3; i < totalGroups; i++) {\n    const start = i * 5;\n    const values = msg.payload.slice(start, start + 5);\n    msg[`group${i}`] = values;\n}\nreturn [msg];",
+        "outputs": 1,
+        "x": 460,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b5c77cc18216a23a",
+        "type": "debug",
+        "z": "8f1cad51c7d9b279",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 340,
+        "wires": []
+    }
+]
